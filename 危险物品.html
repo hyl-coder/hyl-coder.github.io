@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>给小薯条</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0,150,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,150,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .title {
+            font-size: 4rem;
+            color: #00f3ff;
+            text-shadow: 0 0 10px #00f3ff,
+                         0 0 20px #00f3ff,
+                         0 0 30px #00f3ff;
+            position: relative;
+            z-index: 2;
+            background: linear-gradient(45deg, #00f3ff, #7d12ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: scan 3s linear infinite;
+        }
+
+        .glow-line {
+            position: absolute;
+            width: 200%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #7d12ff, transparent);
+            animation: flow 6s linear infinite;
+            filter: drop-shadow(0 0 5px #7d12ff);
+        }
+
+        @keyframes gridMove {
+            from { background-position: 0 0; }
+            to { background-position: 30px 30px; }
+        }
+
+        @keyframes flow {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(50%); }
+        }
+
+        @keyframes scan {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid"></div>
+    <div class="glow-line" style="top: 45%"></div>
+    <div class="glow-line" style="top: 55%"></div>
+    <h1 class="title">爱吃小薯条</h1>
+
+    <canvas class="particles"></canvas>
+
+    <script>
+        const canvas = document.querySelector('.particles');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+                this.radius = Math.random() * 2;
+                this.color = `hsl(${Math.random()*120+200}, 100%, 70%)`;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        const particles = Array(200).fill().map(() => new Particle());
+
+        function animate() {
+            ctx.fillStyle = 'rgba(10, 10, 26, 0.1)';
+            ctx.fillRect(0, 0, width, height);
+            
+            particles.forEach(p => p.update());
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        animate();
+    </script>
+</body>
+</html>
